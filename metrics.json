@@ -1,0 +1,151 @@
+{
+  "project": "AdPulse",
+  "synthetic_data": true,
+  "generated_at_utc": "2026-11-26T01:47:34Z",
+  "scale": "full",
+  "runtime_seconds": 183.8,
+  "generation": {
+    "impressions_rows_raw": 2010000,
+    "impressions_rows_clean": 2000000,
+    "customers_rows": 50000,
+    "transactions_rows": 185877
+  },
+  "pipeline": {
+    "raw_rows": 2010000,
+    "clean_rows": 1969399,
+    "quarantined_rows": 30759,
+    "duplicate_rows_removed": 9842,
+    "quarantine_rate": 0.0153,
+    "parquet_partitioned_write": false,
+    "n_campaigns": 21,
+    "months": 12,
+    "totals": {
+      "impressions": 1969399,
+      "clicks": 46812,
+      "conversions": 3683,
+      "spend": 75477.21,
+      "revenue": 333382.14,
+      "overall_ctr": 0.02377,
+      "overall_roas": 4.417
+    }
+  },
+  "channels": [
+    {
+      "channel": "search",
+      "impressions": 709199,
+      "clicks": 36236,
+      "conversions": 3400,
+      "spend": 69852.46,
+      "revenue": 315441.79,
+      "ctr": 0.051094,
+      "cvr": 0.093829,
+      "cpc": 1.9277,
+      "cpa": 20.5448,
+      "roas": 4.5158
+    },
+    {
+      "channel": "social",
+      "impressions": 400605,
+      "clicks": 5014,
+      "conversions": 169,
+      "spend": 2864.48,
+      "revenue": 10114.72,
+      "ctr": 0.012516,
+      "cvr": 0.033706,
+      "cpc": 0.5713,
+      "cpa": 16.9496,
+      "roas": 3.5311
+    },
+    {
+      "channel": "video",
+      "impressions": 479942,
+      "clicks": 4224,
+      "conversions": 93,
+      "spend": 1949.62,
+      "revenue": 6621.51,
+      "ctr": 0.008801,
+      "cvr": 0.022017,
+      "cpc": 0.4616,
+      "cpa": 20.9637,
+      "roas": 3.3963
+    },
+    {
+      "channel": "display",
+      "impressions": 379653,
+      "clicks": 1338,
+      "conversions": 21,
+      "spend": 810.65,
+      "revenue": 1204.12,
+      "ctr": 0.003524,
+      "cvr": 0.015695,
+      "cpc": 0.6059,
+      "cpa": 38.6024,
+      "roas": 1.4854
+    }
+  ],
+  "anomalies": {
+    "flagged_campaign_days": 427,
+    "by_metric": {
+      "ctr": 273,
+      "spend": 154
+    }
+  },
+  "segmentation": {
+    "customers": 50000,
+    "chosen_k": 3,
+    "silhouette": 0.4505,
+    "segments": [
+      {
+        "kmeans_segment": 0,
+        "customers": 27828,
+        "recency": 309.3,
+        "frequency": 2.54,
+        "monetary": 183.81,
+        "label": "Hibernating / low value"
+      },
+      {
+        "kmeans_segment": 1,
+        "customers": 17292,
+        "recency": 57.6,
+        "frequency": 6.66,
+        "monetary": 626.92,
+        "label": "Champions"
+      },
+      {
+        "kmeans_segment": 2,
+        "customers": 4880,
+        "recency": 459.3,
+        "frequency": 0.0,
+        "monetary": 0.01,
+        "label": "Prospects (rarely/never purchased)"
+      }
+    ]
+  },
+  "ab_test": {
+    "campaign": "search_q3_launch_ab",
+    "true_lift_injected": 0.12,
+    "rate_control": 0.09053,
+    "rate_variant": 0.10113,
+    "relative_lift": 0.1171,
+    "z_stat": 2.194,
+    "p_value": 0.02821,
+    "ci95_abs_lift": [
+      0.00113,
+      0.02007
+    ],
+    "chi2": 4.815,
+    "chi2_p_value": 0.02821,
+    "significant": true,
+    "observed_power": 0.5929,
+    "required_n_per_group_for_mde": 11531
+  },
+  "db_tables_loaded": [
+    "kpi_channel_region_month",
+    "kpi_campaign_month",
+    "daily_campaign",
+    "anomalies",
+    "customer_segments",
+    "segment_profiles",
+    "ab_test_result"
+  ]
+}
