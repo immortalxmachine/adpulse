@@ -222,63 +222,67 @@ def inject_dirt(df: pd.DataFrame, rng: np.random.Generator, rates: C.DirtRates) 
 # Customers & transactions (for RFM / segmentation)
 # --------------------------------------------------------------------------------------
 def build_customers(rng: np.random.Generator, n: int) -> pd.DataFrame:
-    """Customer master: id, signup date, region, acquisition channel."""
+    """Customer master: id, signup date, region, acquisition channel, latent archetype.
+
+    The archetype is ground truth drawn from ``CUSTOMER_ARCHETYPES``; it is written out but
+    never used by the clustering, which must rediscover the structure from RFM alone.
+    """
     signup_span = (C.AS_OF_DATE - C.START_DATE).days + 540  # allow signups before window
     offsets = rng.integers(0, signup_span, size=n)
     base = np.datetime64(C.START_DATE) - np.timedelta64(540, "D")
     signup = base + offsets.astype("timedelta64[D]")
+
+    names = list(C.CUSTOMER_ARCHETYPES)
+    shares = np.array([C.CUSTOMER_ARCHETYPES[a]["share"] for a in names])
+    shares = shares / shares.sum()
+    archetype = rng.choice(names, size=n, p=shares)
+
     return pd.DataFrame(
         {
             "customer_id": np.arange(1, n + 1, dtype=np.int64),
             "signup_date": pd.to_datetime(signup).strftime("%Y-%m-%d"),
             "region": rng.choice(C.REGIONS, size=n, p=C.REGION_WEIGHTS),
             "acq_channel": rng.choice(C.CHANNELS, size=n),
+            "archetype": archetype,
         }
     )
 
 
-def build_transactions(
-    rng: np.random.Generator, customers: pd.DataFrame, avg_orders: float
-) -> pd.DataFrame:
-    """Purchase history: one row per order. Order count per customer ~ Poisson(avg_orders).
+def build_transactions(rng: np.random.Generator, customers: pd.DataFrame) -> pd.DataFrame:
+    """Purchase history: one row per order, driven by each customer's latent archetype.
 
-    Some customers have zero orders (handled as low-value/at-risk in RFM). Order values
-    follow a lognormal distribution anchored on the acquisition channel's AOV.
+    Order count ~ Poisson(archetype lambda); dormant archetypes stop ordering earlier in
+    their lifetime (lower ``recency_frac``) so their Recency is high. Order value is a
+    lognormal around the acquisition channel's AOV, scaled by the archetype's value_mult.
+    Customers with zero orders are kept implicitly (left-joined as zeros in RFM).
     """
-    n_orders = rng.poisson(avg_orders, size=len(customers))
-    frames: list[pd.DataFrame] = []
+    n = len(customers)
+    arche = customers["archetype"].to_numpy()
+    lam = np.array([C.CUSTOMER_ARCHETYPES[a]["orders_lambda"] for a in arche])
+    rfrac = np.array([C.CUSTOMER_ARCHETYPES[a]["recency_frac"] for a in arche])
+    vmult = np.array([C.CUSTOMER_ARCHETYPES[a]["value_mult"] for a in arche])
+    aov = np.array([C.CHANNEL_PRIORS[c]["aov"] for c in customers["acq_channel"].to_numpy()])
+
+    n_orders = rng.poisson(lam)
     signup = pd.to_datetime(customers["signup_date"]).to_numpy()
     as_of = np.datetime64(C.AS_OF_DATE)
 
-    for channel in C.CHANNELS:
-        mask = customers["acq_channel"].to_numpy() == channel
-        aov = C.CHANNEL_PRIORS[channel]["aov"]
-        cust_ids = customers["customer_id"].to_numpy()[mask]
-        counts = n_orders[mask]
-        signups = signup[mask]
-        total = int(counts.sum())
-        if total == 0:
-            continue
+    rep = np.repeat(np.arange(n), n_orders)  # customer row index, one entry per order
+    total = int(rep.size)
+    rep_signup = signup[rep]
+    window = np.clip((as_of - rep_signup) / np.timedelta64(1, "D"), 1, None)
+    # order falls within [signup, signup + recency_frac * window]
+    offsets = (rng.random(total) * window * rfrac[rep]).astype("timedelta64[D]")
+    order_date = rep_signup + offsets
+    order_value = np.round(aov[rep] * vmult[rep] * rng.lognormal(mean=0.0, sigma=0.5, size=total), 2)
 
-        rep_ids = np.repeat(cust_ids, counts)
-        rep_signup = np.repeat(signups, counts)
-        window = (as_of - rep_signup) / np.timedelta64(1, "D")
-        window = np.clip(window, 1, None)
-        order_offsets = (rng.random(total) * window).astype("timedelta64[D]")
-        order_date = rep_signup + order_offsets
-        order_value = np.round(aov * rng.lognormal(mean=0.0, sigma=0.5, size=total), 2)
-
-        frames.append(
-            pd.DataFrame(
-                {
-                    "customer_id": rep_ids,
-                    "order_date": pd.to_datetime(order_date).strftime("%Y-%m-%d"),
-                    "order_value": order_value,
-                }
-            )
-        )
-
-    txns = pd.concat(frames, ignore_index=True)
+    txns = pd.DataFrame(
+        {
+            "customer_id": customers["customer_id"].to_numpy()[rep],
+            "order_date": pd.to_datetime(order_date).strftime("%Y-%m-%d"),
+            "order_value": order_value,
+        }
+    )
     return txns.sample(frac=1.0, random_state=C.RANDOM_SEED).reset_index(drop=True)
 
 
@@ -294,7 +298,7 @@ def generate(scale: C.Scale, seed: int = C.RANDOM_SEED) -> dict[str, int]:
     impressions_clean = build_impressions(rng, campaigns, scale.impressions)
     impressions_dirty = inject_dirt(impressions_clean, rng, C.DIRT)
     customers = build_customers(rng, scale.customers)
-    transactions = build_transactions(rng, customers, scale.avg_orders_per_customer)
+    transactions = build_transactions(rng, customers)
 
     impressions_dirty.to_csv(C.RAW_IMPRESSIONS_CSV, index=False)
     customers.to_csv(C.RAW_CUSTOMERS_CSV, index=False)
@@ -322,7 +326,6 @@ def main() -> None:
         scale = C.Scale(
             impressions=args.impressions or scale.impressions,
             customers=args.customers or scale.customers,
-            avg_orders_per_customer=scale.avg_orders_per_customer,
         )
 
     counts = generate(scale, seed=args.seed)

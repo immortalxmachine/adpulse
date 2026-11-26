@@ -88,11 +88,10 @@ DEFAULT_CREATIVE: str = "default"   # creative label for all non-A/B campaigns
 # --------------------------------------------------------------------------------------
 @dataclass(frozen=True)
 class Scale:
-    """How many rows to simulate."""
+    """How many rows to simulate (order counts come from customer archetypes)."""
 
     impressions: int
     customers: int
-    avg_orders_per_customer: float = 3.5
 
 
 FULL_SCALE: Scale = Scale(impressions=2_000_000, customers=50_000)
@@ -131,6 +130,19 @@ ANOMALY_SIGMA: float = 3.0
 # --------------------------------------------------------------------------------------
 RFM_K_MIN: int = 2
 RFM_K_MAX: int = 8
+
+# Latent customer archetypes. The generator draws each customer from this mixture; the
+# clustering never sees the label and must rediscover the structure from RFM alone.
+#   orders_lambda = mean #orders (Poisson)
+#   recency_frac  = how far into [signup, as_of] their orders can fall (low => dormant)
+#   value_mult    = multiplier on order value
+CUSTOMER_ARCHETYPES: dict[str, dict] = {
+    "champion": {"share": 0.12, "orders_lambda": 9.0, "recency_frac": 1.00, "value_mult": 1.4},
+    "loyal": {"share": 0.23, "orders_lambda": 5.0, "recency_frac": 0.92, "value_mult": 1.1},
+    "promising": {"share": 0.25, "orders_lambda": 2.5, "recency_frac": 0.80, "value_mult": 0.9},
+    "at_risk": {"share": 0.22, "orders_lambda": 3.0, "recency_frac": 0.40, "value_mult": 1.0},
+    "hibernating": {"share": 0.18, "orders_lambda": 1.0, "recency_frac": 0.22, "value_mult": 0.7},
+}
 
 
 def ensure_dirs() -> None:
