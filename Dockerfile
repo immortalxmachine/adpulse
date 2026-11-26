@@ -1,5 +1,5 @@
 # PySpark needs a JVM. Start from a slim Python image and add a headless JDK 17.
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \

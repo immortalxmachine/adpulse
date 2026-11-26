@@ -1,7 +1,7 @@
 # AdPulse — Campaign Analytics with PySpark, Segmentation & A/B Testing
 
 [![CI](https://github.com/immortalxmachine/adpulse/actions/workflows/ci.yml/badge.svg)](https://github.com/immortalxmachine/adpulse/actions/workflows/ci.yml)
-![python](https://img.shields.io/badge/python-3.11%2B-blue)
+![python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![spark](https://img.shields.io/badge/PySpark-4.0-e25a1c)
 ![data](https://img.shields.io/badge/data-100%25%20synthetic-success)
 
@@ -119,5 +119,5 @@ See [`INTERVIEW_NOTES.md`](INTERVIEW_NOTES.md) for 22 Q&A tied to specific files
 
 - **Tests:** `pytest` covers the generator, data-quality rules, KPI maths, A/B statistics and anomaly detection.
 - **Lint:** `ruff check .`
-- **CI:** GitHub Actions sets up Java 17 + Python 3.11, runs lint + tests, then a full
+- **CI:** GitHub Actions sets up Java 17 + Python 3.13, runs lint + tests, then a full
   end-to-end pipeline **smoke test on the Linux runner** (exercising the real Spark Parquet write).
