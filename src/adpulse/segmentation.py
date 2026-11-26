@@ -93,8 +93,8 @@ def _label_segment(row: pd.Series, med: pd.Series) -> str:
     recent = row["recency"] <= med["recency"]
     frequent = row["frequency"] >= med["frequency"]
     high_value = row["monetary"] >= med["monetary"]
-    if row["frequency"] == 0:
-        return "Prospects (never purchased)"
+    if row["frequency"] < 0.5:
+        return "Prospects (rarely/never purchased)"
     if recent and frequent and high_value:
         return "Champions"
     if recent and (frequent or high_value):
