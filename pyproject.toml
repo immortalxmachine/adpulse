@@ -1,0 +1,36 @@
+[project]
+name = "adpulse"
+version = "0.1.0"
+description = "PySpark campaign-analytics pipeline with K-Means segmentation, A/B testing and Excel/Power BI reporting (synthetic data)"
+requires-python = ">=3.11"
+readme = "README.md"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, bugbear, comprehensions, pyupgrade, naming.
+select = ["E", "F", "I", "B", "C4", "UP", "N", "W"]
+ignore = [
+    "E501",  # line length handled by formatter; long comments allowed
+    "N803",  # allow statistical arg names like n_A
+    "N806",  # allow variable names like CI_low in stats code
+    "N812",  # allow idiomatic aliases: `functions as F`, `config as C`, `types as T`
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
