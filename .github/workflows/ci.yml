@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Spark 4 needs a JVM; set up Java 17 before anything imports pyspark.
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+          pip install -e . --no-deps
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Unit tests
+        run: pytest
+
+      # End-to-end smoke test on a small sample: exercises the real Spark pipeline
+      # (clean -> partitioned Parquet -> KPIs), segmentation, A/B test and SQLite load.
+      - name: Pipeline smoke test (CI scale)
+        env:
+          ADPULSE_SCALE: ci
+        run: python -m adpulse.run --scale ci
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adpulse-ci-metrics
+          path: |
+            metrics.json
+            data/output/*.csv
+          if-no-files-found: ignore

@@ -1,0 +1,41 @@
+# Optional, production-like demo: run the pipeline against PostgreSQL and serve the
+# Streamlit dashboard. The default SQLite path needs none of this; this file exists so the
+# Postgres loader can be exercised once Docker is available.
+#
+#   docker compose up --build        # runs the pipeline, then serves the dashboard on :8501
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: adpulse
+      POSTGRES_USER: adpulse
+      POSTGRES_PASSWORD: adpulse_local
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adpulse -d adpulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADPULSE_SCALE: ci
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: adpulse
+      PGUSER: adpulse
+      PGPASSWORD: adpulse_local
+    command: ["python", "-m", "adpulse.run", "--scale", "ci", "--db-target", "postgres"]
+
+  dashboard:
+    build: .
+    depends_on:
+      - pipeline
+    ports:
+      - "8501:8501"
+    command: ["streamlit", "run", "src/adpulse/dashboard.py", "--server.address=0.0.0.0"]
