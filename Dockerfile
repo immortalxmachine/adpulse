@@ -18,6 +18,8 @@ COPY requirements.txt requirements-dev.txt pyproject.toml ./
 RUN pip install -r requirements.txt
 COPY src ./src
 COPY sql ./sql
+# The committed REAL sample lets `--scale ci` run end-to-end with no Kaggle credentials.
+COPY data/sample ./data/sample
 RUN pip install -e . --no-deps
 
 # Default: run the full pipeline at CI scale against SQLite.

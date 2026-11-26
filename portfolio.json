@@ -1,16 +1,16 @@
 {
   "title": "AdPulse",
-  "tagline": "PySpark campaign analytics — segmentation, A/B testing & BI",
+  "tagline": "PySpark marketing & revenue analytics — segmentation, A/B testing & BI (real data)",
   "category": "Data",
   "highlights": [
-    "PySpark ELT over 2M synthetic ad-impression rows, quarantining 1.5% dirty records and computing CTR/CPA/ROAS by channel/region/month via Spark SQL.",
-    "A/B test validated with a two-proportion z-test — +11.7% conversion lift (p=0.028) — with a chi-square cross-check and power analysis.",
-    "Segmented 50K customers via RFM + K-Means (k=3, silhouette 0.45), isolating a 17K Champions cohort ($627 avg LTV)."
+    "PySpark ELT over 1.07M real retail-transaction rows (Online Retail II, UCI), quarantining 2.4% genuinely dirty records (cancellations, non-positive qty/price) and computing revenue/AOV by country/month via Spark SQL window functions.",
+    "Validated a real marketing A/B experiment (ad vs PSA control) with a two-proportion z-test — +43% conversion lift (p<1e-12) — plus a chi-square cross-check and power analysis.",
+    "Segmented 5,878 customers via RFM + K-Means (k=2 by silhouette 0.44), isolating a 2,332-strong Champions cohort (£6.5K avg lifetime value)."
   ],
   "metrics": [
-    { "label": "Rows processed", "value": "2M" },
-    { "label": "A/B lift", "value": "+11.7%" },
-    { "label": "Customers segmented", "value": "50K" }
+    { "label": "Rows processed", "value": "1.07M" },
+    { "label": "A/B lift", "value": "+43%" },
+    { "label": "Customers segmented", "value": "5.9K" }
   ],
   "demo": null,
   "featured": true,

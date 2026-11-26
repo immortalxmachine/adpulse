@@ -4,42 +4,41 @@ The pipeline exports a Power BI-ready **star schema** to `data/output/star/` (CS
 
 | Table | Grain | Key columns |
 |-------|-------|-------------|
-| `fact_campaign_month` | one row per campaign per month | `campaign_key`, `date_key`, additive measures |
-| `dim_campaign` | one row per campaign | `campaign_key`, `campaign`, `channel` |
+| `fact_country_month` | one row per country per month | `country_key`, `date_key`, additive measures |
+| `dim_country` | one row per country | `country_key`, `Country` |
 | `dim_date` | one row per month | `date_key`, `year`, `quarter`, `month_name` |
 
-Only **additive** measures (impressions, clicks, conversions, spend, revenue) live in the
-fact. Ratio KPIs (CTR, ROAS, …) are **DAX measures** so they aggregate correctly at every
-level of the hierarchy — never pre-average a ratio.
+Only **additive** measures (revenue, orders, units, customers) live in the fact. Ratio KPIs
+(AOV, units per order, …) are **DAX measures** so they aggregate correctly at every level of
+the hierarchy — never pre-average a ratio. Note that `customers` is the distinct count *within
+a country-month*; it is semi-additive, so roll it up with `DISTINCTCOUNT` on the source rather
+than `SUM` when you need an all-time distinct customer count.
 
 ## Steps
 1. **Get data → Folder / Text-CSV** and load the three files from `data/output/star/`.
 2. **Model view:** create relationships
-   `fact_campaign_month[campaign_key] → dim_campaign[campaign_key]` and
-   `fact_campaign_month[date_key] → dim_date[date_key]` (both single-direction, 1-to-many).
+   `fact_country_month[country_key] → dim_country[country_key]` and
+   `fact_country_month[date_key] → dim_date[date_key]` (both single-direction, 1-to-many).
 3. Mark `dim_date` as a date table if you extend it to daily grain.
 4. Add the DAX measures below.
-5. Build visuals: spend by channel (bar), ROAS by month (line), campaign table with
-   conditional formatting on ROAS, and a region slicer.
+5. Build visuals: revenue by country (bar), revenue by month (line), country table with
+   conditional formatting on AOV, and a country slicer.
 
 ## Core DAX measures
 ```DAX
-Impressions = SUM ( fact_campaign_month[impressions] )
-Clicks      = SUM ( fact_campaign_month[clicks] )
-Conversions = SUM ( fact_campaign_month[conversions] )
-Spend       = SUM ( fact_campaign_month[spend] )
-Revenue     = SUM ( fact_campaign_month[revenue] )
+Revenue   = SUM ( fact_country_month[revenue] )
+Orders    = SUM ( fact_country_month[orders] )
+Units     = SUM ( fact_country_month[units] )
 
-CTR  = DIVIDE ( [Clicks], [Impressions] )
-CVR  = DIVIDE ( [Conversions], [Clicks] )
-CPC  = DIVIDE ( [Spend], [Clicks] )
-CPA  = DIVIDE ( [Spend], [Conversions] )
-ROAS = DIVIDE ( [Revenue], [Spend] )
+AOV             = DIVIDE ( [Revenue], [Orders] )
+Units per Order = DIVIDE ( [Units], [Orders] )
+Avg Unit Price  = DIVIDE ( [Revenue], [Units] )
 
--- Month-over-month spend growth (needs a marked date table / month ordering)
-Spend MoM % =
-VAR Prev = CALCULATE ( [Spend], DATEADD ( dim_date[date_key], -1, MONTH ) )
-RETURN DIVIDE ( [Spend] - Prev, Prev )
+-- Month-over-month revenue growth (needs a marked date table / month ordering)
+Revenue MoM % =
+VAR Prev = CALCULATE ( [Revenue], DATEADD ( dim_date[date_key], -1, MONTH ) )
+RETURN DIVIDE ( [Revenue] - Prev, Prev )
 ```
 
-> All figures are **synthetic**. See the repository README for how the data is generated.
+> All figures come from **real public data** (Online Retail II, UCI; revenue in GBP). See the
+> repository README for dataset provenance and licensing.

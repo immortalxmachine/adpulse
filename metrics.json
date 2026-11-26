@@ -1,148 +1,240 @@
 {
   "project": "AdPulse",
-  "synthetic_data": true,
-  "generated_at_utc": "2026-11-26T01:47:34Z",
-  "scale": "full",
-  "runtime_seconds": 183.8,
-  "generation": {
-    "impressions_rows_raw": 2010000,
-    "impressions_rows_clean": 2000000,
-    "customers_rows": 50000,
-    "transactions_rows": 185877
-  },
-  "pipeline": {
-    "raw_rows": 2010000,
-    "clean_rows": 1969399,
-    "quarantined_rows": 30759,
-    "duplicate_rows_removed": 9842,
-    "quarantine_rate": 0.0153,
-    "parquet_partitioned_write": false,
-    "n_campaigns": 21,
-    "months": 12,
-    "totals": {
-      "impressions": 1969399,
-      "clicks": 46812,
-      "conversions": 3683,
-      "spend": 75477.21,
-      "revenue": 333382.14,
-      "overall_ctr": 0.02377,
-      "overall_roas": 4.417
+  "synthetic_data": false,
+  "data_sources": {
+    "retail": {
+      "name": "Online Retail II (UCI)",
+      "kaggle_slug": "mashlyn/online-retail-ii-uci",
+      "license": "CC BY 4.0",
+      "currency": "GBP"
+    },
+    "ab_test": {
+      "name": "Marketing A/B Testing",
+      "kaggle_slug": "faviovaz/marketing-ab-testing",
+      "license": "CC0 / public (per Kaggle page)"
     }
   },
-  "channels": [
+  "generated_at_utc": "2026-11-26T04:34:02Z",
+  "scale": "full",
+  "runtime_seconds": 201.8,
+  "staging": {
+    "scale": "full",
+    "retail_rows": 1067371,
+    "ab_rows": 588101,
+    "retail_source": "mashlyn/online-retail-ii-uci",
+    "ab_source": "faviovaz/marketing-ab-testing"
+  },
+  "currency": "GBP",
+  "pipeline": {
+    "raw_rows": 1067371,
+    "clean_rows": 1007913,
+    "quarantined_rows": 25701,
+    "duplicate_rows_removed": 33757,
+    "quarantine_rate": 0.0241,
+    "parquet_partitioned_write": false,
+    "n_countries": 43,
+    "months": 25,
+    "totals": {
+      "revenue": 20476260.43,
+      "orders": 40077,
+      "units": 11205148,
+      "customers": 5878,
+      "aov": 510.92,
+      "avg_unit_price": 1.83
+    }
+  },
+  "top_countries": [
     {
-      "channel": "search",
-      "impressions": 709199,
-      "clicks": 36236,
-      "conversions": 3400,
-      "spend": 69852.46,
-      "revenue": 315441.79,
-      "ctr": 0.051094,
-      "cvr": 0.093829,
-      "cpc": 1.9277,
-      "cpa": 20.5448,
-      "roas": 4.5158
+      "Country": "United Kingdom",
+      "revenue": 17410196.1,
+      "orders": 36535,
+      "units": 9187753,
+      "aov": 476.53,
+      "units_per_order": 251.48,
+      "avg_unit_price": 1.89
     },
     {
-      "channel": "social",
-      "impressions": 400605,
-      "clicks": 5014,
-      "conversions": 169,
-      "spend": 2864.48,
-      "revenue": 10114.72,
-      "ctr": 0.012516,
-      "cvr": 0.033706,
-      "cpc": 0.5713,
-      "cpa": 16.9496,
-      "roas": 3.5311
+      "Country": "EIRE",
+      "revenue": 658767.31,
+      "orders": 626,
+      "units": 336329,
+      "aov": 1052.34,
+      "units_per_order": 537.27,
+      "avg_unit_price": 1.96
     },
     {
-      "channel": "video",
-      "impressions": 479942,
-      "clicks": 4224,
-      "conversions": 93,
-      "spend": 1949.62,
-      "revenue": 6621.51,
-      "ctr": 0.008801,
-      "cvr": 0.022017,
-      "cpc": 0.4616,
-      "cpa": 20.9637,
-      "roas": 3.3963
+      "Country": "Netherlands",
+      "revenue": 554038.09,
+      "orders": 228,
+      "units": 383879,
+      "aov": 2429.99,
+      "units_per_order": 1683.68,
+      "avg_unit_price": 1.44
     },
     {
-      "channel": "display",
-      "impressions": 379653,
-      "clicks": 1338,
-      "conversions": 21,
-      "spend": 810.65,
-      "revenue": 1204.12,
-      "ctr": 0.003524,
-      "cvr": 0.015695,
-      "cpc": 0.6059,
-      "cpa": 38.6024,
-      "roas": 1.4854
+      "Country": "Germany",
+      "revenue": 425019.71,
+      "orders": 789,
+      "units": 225154,
+      "aov": 538.68,
+      "units_per_order": 285.37,
+      "avg_unit_price": 1.89
+    },
+    {
+      "Country": "France",
+      "revenue": 350456.09,
+      "orders": 622,
+      "units": 271901,
+      "aov": 563.43,
+      "units_per_order": 437.14,
+      "avg_unit_price": 1.29
+    },
+    {
+      "Country": "Australia",
+      "revenue": 169283.46,
+      "orders": 95,
+      "units": 103759,
+      "aov": 1781.93,
+      "units_per_order": 1092.2,
+      "avg_unit_price": 1.63
+    },
+    {
+      "Country": "Spain",
+      "revenue": 108332.49,
+      "orders": 154,
+      "units": 50307,
+      "aov": 703.46,
+      "units_per_order": 326.67,
+      "avg_unit_price": 2.15
+    },
+    {
+      "Country": "Switzerland",
+      "revenue": 100685.59,
+      "orders": 93,
+      "units": 52762,
+      "aov": 1082.64,
+      "units_per_order": 567.33,
+      "avg_unit_price": 1.91
+    },
+    {
+      "Country": "Sweden",
+      "revenue": 91869.82,
+      "orders": 105,
+      "units": 88633,
+      "aov": 874.95,
+      "units_per_order": 844.12,
+      "avg_unit_price": 1.04
+    },
+    {
+      "Country": "Denmark",
+      "revenue": 68580.69,
+      "orders": 43,
+      "units": 237471,
+      "aov": 1594.9,
+      "units_per_order": 5522.58,
+      "avg_unit_price": 0.29
+    },
+    {
+      "Country": "Belgium",
+      "revenue": 65387.82,
+      "orders": 149,
+      "units": 34768,
+      "aov": 438.84,
+      "units_per_order": 233.34,
+      "avg_unit_price": 1.88
+    },
+    {
+      "Country": "Norway",
+      "revenue": 56322.5,
+      "orders": 45,
+      "units": 23621,
+      "aov": 1251.61,
+      "units_per_order": 524.91,
+      "avg_unit_price": 2.38
+    },
+    {
+      "Country": "Portugal",
+      "revenue": 56283.53,
+      "orders": 95,
+      "units": 27719,
+      "aov": 592.46,
+      "units_per_order": 291.78,
+      "avg_unit_price": 2.03
+    },
+    {
+      "Country": "Channel Islands",
+      "revenue": 44623.33,
+      "orders": 55,
+      "units": 21396,
+      "aov": 811.33,
+      "units_per_order": 389.02,
+      "avg_unit_price": 2.09
+    },
+    {
+      "Country": "Japan",
+      "revenue": 43023.91,
+      "orders": 33,
+      "units": 31643,
+      "aov": 1303.75,
+      "units_per_order": 958.88,
+      "avg_unit_price": 1.36
     }
   ],
   "anomalies": {
-    "flagged_campaign_days": 427,
+    "flagged_country_days": 327,
     "by_metric": {
-      "ctr": 273,
-      "spend": 154
+      "revenue": 185,
+      "orders": 142
     }
   },
   "segmentation": {
-    "customers": 50000,
-    "chosen_k": 3,
-    "silhouette": 0.4505,
+    "customers": 5878,
+    "chosen_k": 2,
+    "silhouette": 0.4407,
     "segments": [
       {
         "kmeans_segment": 0,
-        "customers": 27828,
-        "recency": 309.3,
-        "frequency": 2.54,
-        "monetary": 183.81,
+        "customers": 3546,
+        "recency": 301.1,
+        "frequency": 2.09,
+        "monetary": 611.55,
         "label": "Hibernating / low value"
       },
       {
         "kmeans_segment": 1,
-        "customers": 17292,
-        "recency": 57.6,
-        "frequency": 6.66,
-        "monetary": 626.92,
+        "customers": 2332,
+        "recency": 51.0,
+        "frequency": 12.67,
+        "monetary": 6520.68,
         "label": "Champions"
-      },
-      {
-        "kmeans_segment": 2,
-        "customers": 4880,
-        "recency": 459.3,
-        "frequency": 0.0,
-        "monetary": 0.01,
-        "label": "Prospects (rarely/never purchased)"
       }
     ]
   },
   "ab_test": {
-    "campaign": "search_q3_launch_ab",
-    "true_lift_injected": 0.12,
-    "rate_control": 0.09053,
-    "rate_variant": 0.10113,
-    "relative_lift": 0.1171,
-    "z_stat": 2.194,
-    "p_value": 0.02821,
+    "control_group": "psa",
+    "variant_group": "ad",
+    "n_control": 23524,
+    "n_variant": 564577,
+    "rate_control": 0.01785,
+    "rate_variant": 0.02555,
+    "relative_lift": 0.4309,
+    "z_stat": 7.37,
+    "p_value": 1.7052807161559727e-13,
     "ci95_abs_lift": [
-      0.00113,
-      0.02007
+      0.00595,
+      0.00943
     ],
-    "chi2": 4.815,
-    "chi2_p_value": 0.02821,
+    "chi2": 54.318,
+    "chi2_p_value": 1.7052807161560133e-13,
     "significant": true,
-    "observed_power": 0.5929,
-    "required_n_per_group_for_mde": 11531
+    "observed_power": 0.9999,
+    "reference_mde": 0.05,
+    "required_n_per_group_for_mde": 353833
   },
   "db_tables_loaded": [
-    "kpi_channel_region_month",
-    "kpi_campaign_month",
-    "daily_campaign",
+    "kpi_country_month",
+    "kpi_monthly",
+    "daily_country",
     "anomalies",
     "customer_segments",
     "segment_profiles",

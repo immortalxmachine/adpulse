@@ -17,9 +17,9 @@ from . import config as C
 
 # Logical table name -> output file produced by the pipeline / run orchestrator.
 DISK_TABLES: dict[str, str] = {
-    "kpi_channel_region_month": "kpi_channel_region_month.csv",
-    "kpi_campaign_month": "kpi_campaign_month.csv",
-    "daily_campaign": "daily_campaign.csv",
+    "kpi_country_month": "kpi_country_month.csv",
+    "kpi_monthly": "kpi_monthly.csv",
+    "daily_country": "daily_country.csv",
     "anomalies": "anomalies.csv",
     "customer_segments": "customer_segments.csv",
     "segment_profiles": "segment_profiles.csv",

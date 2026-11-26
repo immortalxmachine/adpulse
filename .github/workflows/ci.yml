@@ -37,8 +37,9 @@ jobs:
       - name: Unit tests
         run: pytest
 
-      # End-to-end smoke test on a small sample: exercises the real Spark pipeline
-      # (clean -> partitioned Parquet -> KPIs), segmentation, A/B test and SQLite load.
+      # End-to-end smoke test on the committed REAL sample (data/sample/): exercises the
+      # real Spark pipeline (clean -> partitioned Parquet -> KPIs), segmentation, A/B test
+      # and SQLite load. No Kaggle credentials needed — the sample ships with the repo.
       - name: Pipeline smoke test (CI scale)
         env:
           ADPULSE_SCALE: ci

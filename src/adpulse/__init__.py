@@ -1,7 +1,8 @@
-"""AdPulse: a synthetic campaign-analytics pipeline for a data-analyst portfolio.
+"""AdPulse: a marketing & revenue analytics pipeline for a data-analyst portfolio.
 
-All data processed here is SYNTHETIC and generated locally (see adpulse.generate_data).
-No real advertising, customer, or financial data is used anywhere in this project.
+Runs on REAL public data — Online Retail II (UCI) transactions and the Marketing A/B
+Testing experiment (both from Kaggle). No rows are generated and no values are fabricated;
+see adpulse.prepare_data and the repository README for dataset provenance and licensing.
 """
 
 __version__ = "0.1.0"

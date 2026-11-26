@@ -1,7 +1,7 @@
--- Business question: which campaigns triggered the most anomalies, and in which direction?
+-- Business question: which countries triggered the most anomalies, and in which direction?
 -- Aggregates the anomaly log produced by the rolling z-score detector.
 SELECT
-    campaign,
+    Country,
     metric,
     direction,
     COUNT(*)                     AS n_flags,
@@ -9,5 +9,5 @@ SELECT
     MIN(date)                    AS first_flag,
     MAX(date)                    AS last_flag
 FROM anomalies
-GROUP BY campaign, metric, direction
+GROUP BY Country, metric, direction
 ORDER BY n_flags DESC, avg_abs_z DESC;

@@ -1,15 +1,14 @@
-"""Campaign KPI formulas as small, pure, testable functions.
+"""Retail KPI formulas as small, pure, testable functions.
 
 Keeping the maths here (rather than only inside Spark expressions) means the definitions
 are documented in one place and can be unit-tested with hand-computed expectations. The
 Spark pipeline mirrors these exact formulas in Spark SQL.
 
-Glossary:
-  CTR  - click-through rate      = clicks / impressions
-  CVR  - conversion rate         = conversions / clicks
-  CPC  - cost per click          = spend / clicks
-  CPA  - cost per acquisition    = spend / conversions
-  ROAS - return on ad spend      = revenue / spend
+Glossary (all derived from additive components so they recompute correctly after a SUM):
+  AOV                  - average order value      = revenue / orders
+  units per order      - basket size              = units / orders
+  revenue per customer - customer value           = revenue / customers
+  avg unit price       - price realised per unit  = revenue / units
 """
 
 from __future__ import annotations
@@ -24,39 +23,33 @@ def safe_div(numerator: float, denominator: float) -> float:
     return numerator / denominator
 
 
-def ctr(clicks: float, impressions: float) -> float:
-    """Click-through rate in [0, 1]."""
-    return safe_div(clicks, impressions)
+def aov(revenue: float, orders: float) -> float:
+    """Average order value (£ per order)."""
+    return safe_div(revenue, orders)
 
 
-def cvr(conversions: float, clicks: float) -> float:
-    """Conversion rate (conversions per click) in [0, 1]."""
-    return safe_div(conversions, clicks)
+def units_per_order(units: float, orders: float) -> float:
+    """Average basket size (units per order)."""
+    return safe_div(units, orders)
 
 
-def cpc(spend: float, clicks: float) -> float:
-    """Average cost per click ($)."""
-    return safe_div(spend, clicks)
+def revenue_per_customer(revenue: float, customers: float) -> float:
+    """Average revenue per identified customer (£)."""
+    return safe_div(revenue, customers)
 
 
-def cpa(spend: float, conversions: float) -> float:
-    """Average cost per acquisition ($)."""
-    return safe_div(spend, conversions)
-
-
-def roas(revenue: float, spend: float) -> float:
-    """Return on ad spend (revenue earned per $1 spent)."""
-    return safe_div(revenue, spend)
+def avg_unit_price(revenue: float, units: float) -> float:
+    """Average realised price per unit (£)."""
+    return safe_div(revenue, units)
 
 
 def all_kpis(
-    impressions: float, clicks: float, conversions: float, spend: float, revenue: float
+    revenue: float, orders: float, units: float, customers: float
 ) -> dict[str, float]:
-    """Compute every KPI from a set of additive aggregates."""
+    """Compute every ratio KPI from a set of additive aggregates."""
     return {
-        "ctr": ctr(clicks, impressions),
-        "cvr": cvr(conversions, clicks),
-        "cpc": cpc(spend, clicks),
-        "cpa": cpa(spend, conversions),
-        "roas": roas(revenue, spend),
+        "aov": aov(revenue, orders),
+        "units_per_order": units_per_order(units, orders),
+        "revenue_per_customer": revenue_per_customer(revenue, customers),
+        "avg_unit_price": avg_unit_price(revenue, units),
     }

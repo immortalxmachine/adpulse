@@ -34,33 +34,40 @@ class SegmentationResult:
     silhouette: float
 
 
-def compute_rfm(transactions: pd.DataFrame, customers: pd.DataFrame, as_of) -> pd.DataFrame:
-    """Build RFM features for every customer (including those who never purchased).
+def compute_rfm(transactions: pd.DataFrame, customers: pd.DataFrame | None, as_of) -> pd.DataFrame:
+    """Build RFM features for every identified customer from the real invoice history.
 
-    recency   = days since most recent order (capped for never-purchased at days since signup)
-    frequency = number of orders
-    monetary  = total spend
+    recency   = days since most recent order (relative to ``as_of``)
+    frequency = number of distinct orders (invoices)
+    monetary  = total spend (sum of line revenue)
+
+    The retail data only contains customers who have purchased, so every row has
+    frequency >= 1 (there is no "never purchased" cohort to model, unlike a CRM export).
     """
     as_of = pd.Timestamp(as_of)
     txn = transactions.copy()
     txn["order_date"] = pd.to_datetime(txn["order_date"], errors="coerce")
+    freq_col = "invoice" if "invoice" in txn.columns else "order_date"
 
-    agg = txn.groupby("customer_id").agg(
-        last_order=("order_date", "max"),
-        frequency=("order_date", "count"),
-        monetary=("order_value", "sum"),
+    rfm = (
+        txn.groupby("customer_id")
+        .agg(
+            last_order=("order_date", "max"),
+            frequency=(freq_col, "nunique"),
+            monetary=("order_value", "sum"),
+        )
+        .reset_index()
     )
+    rfm["frequency"] = rfm["frequency"].astype(int)
+    rfm["monetary"] = rfm["monetary"].round(2)
+    rfm["recency"] = (as_of - rfm["last_order"]).dt.days.clip(lower=0)
 
-    cust = customers.copy()
-    cust["signup_date"] = pd.to_datetime(cust["signup_date"], errors="coerce")
-    rfm = cust.merge(agg, on="customer_id", how="left")
+    if customers is not None and "country" in customers.columns:
+        rfm = rfm.merge(customers[["customer_id", "country"]], on="customer_id", how="left")
+    else:
+        rfm["country"] = "Unknown"
 
-    rfm["frequency"] = rfm["frequency"].fillna(0).astype(int)
-    rfm["monetary"] = rfm["monetary"].fillna(0.0)
-    # recency: from last order if any, else from signup (treated as long-dormant)
-    last = rfm["last_order"].fillna(rfm["signup_date"])
-    rfm["recency"] = (as_of - last).dt.days.clip(lower=0)
-    return rfm[["customer_id", "region", "acq_channel", "recency", "frequency", "monetary"]]
+    return rfm[["customer_id", "country", "recency", "frequency", "monetary"]]
 
 
 def _feature_matrix(rfm: pd.DataFrame) -> np.ndarray:
@@ -93,8 +100,6 @@ def _label_segment(row: pd.Series, med: pd.Series) -> str:
     recent = row["recency"] <= med["recency"]
     frequent = row["frequency"] >= med["frequency"]
     high_value = row["monetary"] >= med["monetary"]
-    if row["frequency"] < 0.5:
-        return "Prospects (rarely/never purchased)"
     if recent and frequent and high_value:
         return "Champions"
     if recent and (frequent or high_value):

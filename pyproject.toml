@@ -1,7 +1,7 @@
 [project]
 name = "adpulse"
 version = "0.1.0"
-description = "PySpark campaign-analytics pipeline with K-Means segmentation, A/B testing and Excel/Power BI reporting (synthetic data)"
+description = "PySpark marketing & revenue analytics on real public data (Online Retail II + Marketing A/B Testing): KPIs, K-Means segmentation, A/B testing and Excel/Power BI reporting"
 requires-python = ">=3.12"
 readme = "README.md"
 

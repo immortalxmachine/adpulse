@@ -1,4 +1,4 @@
-"""A/B test analysis for two ad creatives.
+"""A/B test analysis for two experiment groups (here: ``ad`` treatment vs ``psa`` control).
 
 Primary test: two-proportion z-test on conversion rate (statsmodels), with a Wald
 confidence interval on the difference, a power / sample-size check, and a plain-language
@@ -115,7 +115,7 @@ def conclude(result: ABResult) -> str:
     direction = "higher" if result.abs_lift > 0 else "lower"
     verb = "is" if result.significant else "is NOT"
     return (
-        f"Creative B converted at {result.rate_b:.3%} vs creative A at {result.rate_a:.3%} "
+        f"The variant converted at {result.rate_b:.3%} vs the control at {result.rate_a:.3%} "
         f"({result.rel_lift:+.1%} relative, {direction}). This difference {verb} statistically "
         f"significant at alpha={result.alpha:g} (z={result.z_stat:.2f}, p={result.p_value:.4g}). "
         f"The 95% confidence interval for the absolute lift is "

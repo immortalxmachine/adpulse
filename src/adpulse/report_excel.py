@@ -1,7 +1,7 @@
 """Export a formatted Excel workbook with openpyxl.
 
 Sheets:
-  * KPI by channel - aggregated KPIs per channel, with a NATIVE Excel bar chart of spend.
+  * KPI by country - aggregated KPIs per country, with a NATIVE Excel bar chart of revenue.
   * Segments       - K-Means segment profiles.
   * A/B test       - the two-proportion z-test result, laid out as a mini scorecard.
 
@@ -41,7 +41,7 @@ def _write_df(ws, df: pd.DataFrame, start_row: int = 1) -> int:
 
 
 def build_workbook(
-    kpi_by_channel: pd.DataFrame,
+    kpi_by_country: pd.DataFrame,
     segment_profiles: pd.DataFrame,
     ab_result: dict,
     path: Path,
@@ -49,20 +49,20 @@ def build_workbook(
     """Build and save the workbook. Returns the output path."""
     wb = Workbook()
 
-    # --- Sheet 1: KPI by channel + native bar chart ---
+    # --- Sheet 1: KPI by country + native bar chart ---
     ws = wb.active
-    ws.title = "KPI by channel"
-    ws["A1"] = "AdPulse - KPIs by channel (synthetic data)"
+    ws.title = "KPI by country"
+    ws["A1"] = "AdPulse - KPIs by country (Online Retail II, real data, GBP)"
     ws["A1"].font = TITLE_FONT
-    last = _write_df(ws, kpi_by_channel, start_row=3)
+    last = _write_df(ws, kpi_by_country, start_row=3)
 
     chart = BarChart()
-    chart.title = "Spend by channel"
+    chart.title = "Revenue by country"
     chart.type = "col"
-    chart.y_axis.title = "Spend ($)"
-    chart.x_axis.title = "Channel"
-    spend_col = list(kpi_by_channel.columns).index("spend") + 1
-    data = Reference(ws, min_col=spend_col, min_row=3, max_row=last)
+    chart.y_axis.title = "Revenue (GBP)"
+    chart.x_axis.title = "Country"
+    rev_col = list(kpi_by_country.columns).index("revenue") + 1
+    data = Reference(ws, min_col=rev_col, min_row=3, max_row=last)
     cats = Reference(ws, min_col=1, min_row=4, max_row=last)
     chart.add_data(data, titles_from_data=True)
     chart.set_categories(cats)
@@ -77,7 +77,7 @@ def build_workbook(
 
     # --- Sheet 3: A/B scorecard ---
     ws3 = wb.create_sheet("A-B test")
-    ws3["A1"] = "A/B test: creative_A (control) vs creative_B (variant)"
+    ws3["A1"] = "A/B test: psa (control) vs ad (variant)"
     ws3["A1"].font = TITLE_FONT
     scorecard = pd.DataFrame(
         {
